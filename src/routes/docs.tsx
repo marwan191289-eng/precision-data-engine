@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { engineList } from "@/lib/engines/registry";
-import { AppShell } from "@/components/layout/AppShell";
+
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/docs")({
       { name: "description", content: "Full mathematical documentation for every engine: equations, method, complexity, and error bounds." },
     ],
   }),
-  component: () => <AppShell><DocsPage /></AppShell>,
+  component: DocsPage,
 });
 
 function DocsPage() {

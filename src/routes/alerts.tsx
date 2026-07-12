@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useAlerts } from "@/hooks/use-runs";
-import { AppShell } from "@/components/layout/AppShell";
 import { Bell, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({ meta: [{ title: "Alerts · Precision Engine Suite" }] }),
-  component: () => <AppShell><AlertsPage /></AppShell>,
+  component: AlertsPage,
 });
 
 function AlertsPage() {

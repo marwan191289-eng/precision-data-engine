@@ -5,7 +5,6 @@ import { engines } from "@/lib/engines/registry";
 import type { EngineId, EngineResult } from "@/lib/engines/types";
 import { RunPanel } from "@/components/engines/RunPanel";
 import { ResultView } from "@/components/engines/ResultView";
-import { AppShell } from "@/components/layout/AppShell";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/engines/$engineId")({
@@ -19,11 +18,7 @@ export const Route = createFileRoute("/engines/$engineId")({
       ],
     };
   },
-  component: () => (
-    <AppShell>
-      <EngineDetail />
-    </AppShell>
-  ),
+  component: EngineDetail,
   notFoundComponent: () => <div className="p-8">Engine not found</div>,
   errorComponent: ({ error }) => <div className="p-8 text-destructive">{String(error)}</div>,
 });

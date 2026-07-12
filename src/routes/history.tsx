@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useRuns } from "@/hooks/use-runs";
-import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { clearAll } from "@/lib/db";
 import { fmt } from "@/lib/engines/checksum";
@@ -11,7 +10,7 @@ import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/history")({
   head: () => ({ meta: [{ title: "Run History · Precision Engine Suite" }] }),
-  component: () => <AppShell><HistoryPage /></AppShell>,
+  component: HistoryPage,
 });
 
 function HistoryPage() {

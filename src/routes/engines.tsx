@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { engineList } from "@/lib/engines/registry";
 import { EngineCard } from "@/components/engines/EngineCard";
-import { AppShell } from "@/components/layout/AppShell";
 
 export const Route = createFileRoute("/engines")({
   head: () => ({
@@ -11,11 +10,7 @@ export const Route = createFileRoute("/engines")({
       { name: "description", content: "Numerical integration, OLS regression, FFT, ODE solvers, and descriptive statistics — verifiable and deterministic." },
     ],
   }),
-  component: () => (
-    <AppShell>
-      <EnginesIndex />
-    </AppShell>
-  ),
+  component: EnginesIndex,
 });
 
 function EnginesIndex() {
