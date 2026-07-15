@@ -1,3 +1,10 @@
+// Stable, order-independent checksum — ported verbatim from
+// precision-data-engine. Used to give every analysis run a short,
+// reproducible fingerprint: if two runs on the same closed candles
+// produce the same checksum, the pipeline is deterministic; if they
+// differ unexpectedly, that's a real signal something changed (data,
+// code, or model state).
+
 export function checksum(value: unknown): string {
   const s = stableJson(value);
   let h = 5381;
@@ -10,10 +17,4 @@ function stableJson(v: unknown): string {
   if (Array.isArray(v)) return "[" + v.map(stableJson).join(",") + "]";
   const keys = Object.keys(v as object).sort();
   return "{" + keys.map((k) => JSON.stringify(k) + ":" + stableJson((v as Record<string, unknown>)[k])).join(",") + "}";
-}
-
-export function fmt(n: number, digits = 6): string {
-  if (!Number.isFinite(n)) return String(n);
-  if (Object.is(n, -0)) n = 0;
-  return Number(n.toPrecision(digits)).toString();
 }

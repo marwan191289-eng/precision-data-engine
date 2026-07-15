@@ -1,69 +1,97 @@
-import Dexie, { type Table } from "dexie";
-import type { EngineId, EngineResult } from "./engines/types";
+// Local audit trail — ported and adapted from precision-data-engine's
+// db.ts. Every full analysis run is logged with its composite score,
+// audit score (from verify.ts) and a checksum, so a user can go back and
+// see exactly what the system said, when, and how corroborated it was —
+// this is the "credibility & transparency" backbone of the merged system.
 
-export interface RunRecord {
+import Dexie, { type Table } from "dexie";
+import { checksum } from "./engines/checksum";
+import type { AuditResult } from "./engines/verify";
+
+export interface AnalysisRunRecord {
   id?: number;
-  engineId: EngineId;
-  input: unknown;
-  result: EngineResult;
-  createdAt: number;
-  status: "ok" | "failed";
-  errorMessage?: string;
+  symbol: string;
+  interval: string;
+  timestamp: number;
+  price: number;
+  compositeScore: number;
+  uncertainty: number;
+  auditScore: number;
+  checksum: string;
+  alert: string | null;
+  auditFlags: string[]; // names of failed checks only, for quick scanning
 }
 
 export interface AlertRecord {
   id?: number;
-  kind: "completed" | "failed" | "threshold";
-  engineId: EngineId;
+  symbol: string;
+  interval: string;
   message: string;
+  compositeScore: number;
   createdAt: number;
   read: boolean;
 }
 
-class PesDB extends Dexie {
-  runs!: Table<RunRecord, number>;
+class TradingAuditDB extends Dexie {
+  runs!: Table<AnalysisRunRecord, number>;
   alerts!: Table<AlertRecord, number>;
   constructor() {
-    super("precision-engine-suite");
+    super("accurate-engine-terminal-audit");
     this.version(1).stores({
-      runs: "++id, engineId, createdAt, status",
-      alerts: "++id, kind, engineId, createdAt, read",
+      runs: "++id, symbol, interval, timestamp",
+      alerts: "++id, symbol, createdAt, read",
     });
   }
 }
 
-export const db: PesDB | null = typeof indexedDB !== "undefined" ? new PesDB() : null;
+export const db: TradingAuditDB | null =
+  typeof indexedDB !== "undefined" ? new TradingAuditDB() : null;
 
-export const channel: BroadcastChannel | null =
-  typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("pes-sync") : null;
-
-export type SyncEvent =
-  | { type: "run"; record: RunRecord }
-  | { type: "alert"; record: AlertRecord }
-  | { type: "clear" };
-
-export function publish(ev: SyncEvent) { channel?.postMessage(ev); }
-
-export async function saveRun(rec: Omit<RunRecord, "id" | "createdAt">) {
-  if (!db) throw new Error("IndexedDB unavailable");
-  const record: RunRecord = { ...rec, createdAt: Date.now() };
-  const id = await db.runs.add(record);
-  const full = { ...record, id };
-  publish({ type: "run", record: full });
-  return full;
+export function computeRunChecksum(input: {
+  symbol: string;
+  interval: string;
+  timestamp: number;
+  compositeScore: number;
+  auditScore: number;
+}): string {
+  return checksum(input);
 }
 
-export async function saveAlert(rec: Omit<AlertRecord, "id" | "createdAt" | "read">) {
-  if (!db) throw new Error("IndexedDB unavailable");
-  const record: AlertRecord = { ...rec, createdAt: Date.now(), read: false };
-  const id = await db.alerts.add(record);
-  publish({ type: "alert", record: { ...record, id } });
-  return { ...record, id };
-}
-
-export async function clearAll() {
+/** Fire-and-forget: never let audit persistence break the live analysis loop. */
+export async function saveAnalysisRun(
+  rec: Omit<AnalysisRunRecord, "id" | "checksum">,
+): Promise<void> {
   if (!db) return;
-  await db.runs.clear();
-  await db.alerts.clear();
-  publish({ type: "clear" });
+  try {
+    const record: AnalysisRunRecord = { ...rec, checksum: computeRunChecksum(rec) };
+    await db.runs.add(record);
+    // Keep the local audit trail bounded — retain the most recent 2000 runs.
+    const count = await db.runs.count();
+    if (count > 2000) {
+      const oldest = await db.runs.orderBy("timestamp").limit(count - 2000).toArray();
+      await db.runs.bulkDelete(oldest.map((r) => r.id!).filter(Boolean));
+    }
+  } catch {
+    // Swallow persistence errors — the audit log is a convenience, not a
+    // dependency of the trading loop.
+  }
+}
+
+export async function saveAlert(rec: Omit<AlertRecord, "id" | "createdAt" | "read">): Promise<void> {
+  if (!db) return;
+  try {
+    await db.alerts.add({ ...rec, createdAt: Date.now(), read: false });
+  } catch {
+    // same rationale as above
+  }
+}
+
+export async function recentRuns(symbol?: string, limit = 100): Promise<AnalysisRunRecord[]> {
+  if (!db) return [];
+  const q = symbol ? db.runs.where("symbol").equals(symbol) : db.runs.toCollection();
+  return q.reverse().sortBy("timestamp").then((r) => r.slice(0, limit));
+}
+
+export function summarizeAudit(audit: AuditResult): string[] {
+  return audit.checks.filter((c) => !c.ok).map((c) => c.name);
 }

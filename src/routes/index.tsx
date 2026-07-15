@@ -1,96 +1,40 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
-import { engineList } from "@/lib/engines/registry";
-import { EngineCard } from "@/components/engines/EngineCard";
-import { useRuns, useAlerts } from "@/hooks/use-runs";
-import { poolSize } from "@/lib/worker-pool";
-import { Activity, Cpu, Bell, History } from "lucide-react";
-import { fmt } from "@/lib/engines/checksum";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { TradingTerminal } from "@/components/terminal/TradingTerminal";
 
 export const Route = createFileRoute("/")({
-  component: Dashboard,
+  head: () => ({
+    meta: [
+      { title: "Accurate Engine Terminal — Elliott · CVD · SMC · LSTM" },
+      {
+        name: "description",
+        content:
+          "Multi-engine trading analysis terminal with Elliott Wave, CVD, Smart Money Concepts, and in-browser LSTM neural predictions on live Binance data.",
+      },
+      { property: "og:title", content: "Accurate Engine Terminal" },
+      {
+        property: "og:description",
+        content: "Elliott · CVD · SMC · LSTM confluence signals on live crypto data.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-function Dashboard() {
-  const { t } = useTranslation();
-  const runs = useRuns(10);
-  const alerts = useAlerts();
-  const openAlerts = alerts.filter(a => !a.read).length;
-  const avgMs = runs.length ? runs.reduce((a, r) => a + r.result.durationMs, 0) / runs.length : 0;
+function Home() {
+  // TF.js and Binance fetches are browser-only — mount client-side.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  return (
-    <div className="grid gap-8">
-      <motion.section
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="surface-elevated relative overflow-hidden p-8"
-      >
-        <div className="absolute -end-24 -top-24 h-64 w-64 rounded-full gradient-primary opacity-20 blur-3xl" />
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-medium text-primary">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-            deterministic · verifiable · in-browser
-          </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{t("app.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">{t("app.tagline")}</p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <Link to="/engines" className="rounded-md gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground glow-primary">
-              {t("nav.engines")}
-            </Link>
-            <Link to="/docs" className="rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium hover:bg-secondary/70">
-              {t("nav.docs")}
-            </Link>
-          </div>
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="w-2 h-2 rounded-full bg-primary pulse-ring" style={{ color: "var(--color-primary)" }} />
+          <span className="font-mono text-sm">initializing engines…</span>
         </div>
-      </motion.section>
-
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Kpi icon={History} label={t("hero.kpiRuns")} value={String(runs.length ? "≥ " + runs.length : "0")} />
-        <Kpi icon={Cpu} label={t("hero.kpiEngines")} value={String(engineList.length)} />
-        <Kpi icon={Activity} label={t("hero.kpiWorkers")} value={String(poolSize())} />
-        <Kpi icon={Bell} label={t("hero.kpiAlerts")} value={String(openAlerts)} />
-      </section>
-
-      <section>
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold">{t("nav.engines")}</h2>
-          <Link to="/engines" className="text-xs text-muted-foreground hover:text-foreground">→</Link>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {engineList.map(e => <EngineCard key={e.id} engine={e} />)}
-        </div>
-      </section>
-
-      {runs.length > 0 && (
-        <section>
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="text-lg font-semibold">{t("nav.history")}</h2>
-            <span className="text-xs text-muted-foreground">avg {fmt(avgMs, 3)} ms</span>
-          </div>
-          <div className="surface-elevated divide-y divide-border/50">
-            {runs.slice(0, 6).map(r => (
-              <Link key={r.id} to="/engines/$engineId" params={{ engineId: r.engineId }}
-                className="flex items-center gap-3 px-4 py-2.5 text-xs transition hover:bg-secondary/50">
-                <span className="font-mono text-muted-foreground">{new Date(r.createdAt).toLocaleTimeString()}</span>
-                <span className="flex-1 truncate">{r.engineId}</span>
-                <span className="font-mono">{fmt(r.result.durationMs, 3)} ms</span>
-                <span className="font-mono text-muted-foreground">{r.result.checksum}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
-
-function Kpi({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
-  return (
-    <div className="surface-elevated p-4">
-      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
-    </div>
-  );
+    );
+  }
+  return <TradingTerminal />;
 }

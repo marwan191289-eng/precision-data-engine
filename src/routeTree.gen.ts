@@ -9,167 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as HistoryRouteImport } from './routes/history'
-import { Route as EnginesRouteImport } from './routes/engines'
-import { Route as DocsRouteImport } from './routes/docs'
-import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EnginesEngineIdRouteImport } from './routes/engines.$engineId'
-import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HistoryRoute = HistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnginesRoute = EnginesRouteImport.update({
-  id: '/engines',
-  path: '/engines',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsRoute = DocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AlertsRoute = AlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EnginesEngineIdRoute = EnginesEngineIdRouteImport.update({
-  id: '/$engineId',
-  path: '/$engineId',
-  getParentRoute: () => EnginesRoute,
-} as any)
-const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
-  id: '/api/public/health',
-  path: '/api/public/health',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/docs': typeof DocsRoute
-  '/engines': typeof EnginesRouteWithChildren
-  '/history': typeof HistoryRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/engines/$engineId': typeof EnginesEngineIdRoute
-  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/docs': typeof DocsRoute
-  '/engines': typeof EnginesRouteWithChildren
-  '/history': typeof HistoryRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/engines/$engineId': typeof EnginesEngineIdRoute
-  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/docs': typeof DocsRoute
-  '/engines': typeof EnginesRouteWithChildren
-  '/history': typeof HistoryRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/engines/$engineId': typeof EnginesEngineIdRoute
-  '/api/public/health': typeof ApiPublicHealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/alerts'
-    | '/docs'
-    | '/engines'
-    | '/history'
-    | '/sitemap.xml'
-    | '/engines/$engineId'
-    | '/api/public/health'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/alerts'
-    | '/docs'
-    | '/engines'
-    | '/history'
-    | '/sitemap.xml'
-    | '/engines/$engineId'
-    | '/api/public/health'
-  id:
-    | '__root__'
-    | '/'
-    | '/alerts'
-    | '/docs'
-    | '/engines'
-    | '/history'
-    | '/sitemap.xml'
-    | '/engines/$engineId'
-    | '/api/public/health'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AlertsRoute: typeof AlertsRoute
-  DocsRoute: typeof DocsRoute
-  EnginesRoute: typeof EnginesRouteWithChildren
-  HistoryRoute: typeof HistoryRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/history': {
-      id: '/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof HistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/engines': {
-      id: '/engines'
-      path: '/engines'
-      fullPath: '/engines'
-      preLoaderRoute: typeof EnginesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/alerts': {
-      id: '/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof AlertsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -177,42 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/engines/$engineId': {
-      id: '/engines/$engineId'
-      path: '/$engineId'
-      fullPath: '/engines/$engineId'
-      preLoaderRoute: typeof EnginesEngineIdRouteImport
-      parentRoute: typeof EnginesRoute
-    }
-    '/api/public/health': {
-      id: '/api/public/health'
-      path: '/api/public/health'
-      fullPath: '/api/public/health'
-      preLoaderRoute: typeof ApiPublicHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
-interface EnginesRouteChildren {
-  EnginesEngineIdRoute: typeof EnginesEngineIdRoute
-}
-
-const EnginesRouteChildren: EnginesRouteChildren = {
-  EnginesEngineIdRoute: EnginesEngineIdRoute,
-}
-
-const EnginesRouteWithChildren =
-  EnginesRoute._addFileChildren(EnginesRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AlertsRoute: AlertsRoute,
-  DocsRoute: DocsRoute,
-  EnginesRoute: EnginesRouteWithChildren,
-  HistoryRoute: HistoryRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ApiPublicHealthRoute: ApiPublicHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
