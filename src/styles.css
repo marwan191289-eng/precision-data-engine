@@ -4,28 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,144 +29,155 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-bull: var(--bull);
+  --color-bear: var(--bear);
+  --color-neutral: var(--neutral);
+  --color-panel: var(--panel);
+  --color-panel-elevated: var(--panel-elevated);
+  --color-grid: var(--grid);
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Precision Engine Suite — instrument-panel dark by default */
-  --background: oklch(0.16 0.02 240);
-  --foreground: oklch(0.96 0.01 240);
-  --card: oklch(0.20 0.025 240);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.20 0.025 240);
-  --popover-foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.75 0.18 180);
-  --primary-foreground: oklch(0.15 0.02 240);
-  --secondary: oklch(0.26 0.03 240);
-  --secondary-foreground: oklch(0.96 0.01 240);
-  --muted: oklch(0.24 0.025 240);
-  --muted-foreground: oklch(0.70 0.02 240);
-  --accent: oklch(0.65 0.20 40);
-  --accent-foreground: oklch(0.15 0.02 240);
-  --destructive: oklch(0.62 0.24 22);
-  --destructive-foreground: oklch(0.98 0.01 240);
-  --success: oklch(0.72 0.18 155);
-  --warning: oklch(0.80 0.17 85);
-  --border: oklch(0.30 0.03 240);
-  --input: oklch(0.26 0.03 240);
-  --ring: oklch(0.75 0.18 180);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.72 0.18 155);
-  --chart-3: oklch(0.75 0.18 180);
-  --chart-4: oklch(0.80 0.17 85);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.18 0.025 240);
-  --sidebar-foreground: oklch(0.94 0.01 240);
-  --sidebar-primary: oklch(0.75 0.18 180);
-  --sidebar-primary-foreground: oklch(0.15 0.02 240);
-  --sidebar-accent: oklch(0.24 0.03 240);
-  --sidebar-accent-foreground: oklch(0.94 0.01 240);
-  --sidebar-border: oklch(0.30 0.03 240);
-  --sidebar-ring: oklch(0.75 0.18 180);
-  --font-sans: "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --shadow-glow: 0 0 24px oklch(0.75 0.18 180 / 0.25);
-  --gradient-primary: linear-gradient(135deg, oklch(0.75 0.18 180), oklch(0.65 0.20 200));
+  --radius: 0.85rem;
+
+  /* ── Deep obsidian trading desk ─────────────────── */
+  --background:       oklch(0.145 0.018 258);
+  --foreground:       oklch(0.965 0.008 250);
+
+  --panel:            oklch(0.185 0.018 258);
+  --panel-elevated:   oklch(0.225 0.022 258);
+  --grid:             oklch(0.28  0.018 258);
+
+  --card:             oklch(0.185 0.018 258);
+  --card-foreground:  oklch(0.965 0.008 250);
+  --popover:          oklch(0.205 0.018 258);
+  --popover-foreground: oklch(0.965 0.008 250);
+
+  /* ── Electric cyan signature ─────────────────────── */
+  --primary:          oklch(0.84 0.17 196);
+  --primary-foreground: oklch(0.14 0.02 258);
+
+  --secondary:        oklch(0.255 0.025 258);
+  --secondary-foreground: oklch(0.965 0.008 250);
+
+  --muted:            oklch(0.235 0.018 258);
+  --muted-foreground: oklch(0.62 0.025 250);
+
+  --accent:           oklch(0.76 0.19 308);
+  --accent-foreground: oklch(0.14 0.02 258);
+
+  /* ── Trading semantics ───────────────────────────── */
+  /* Emerald green bull — not too saturated, easy on eyes */
+  --bull:    oklch(0.76 0.185 158);
+  /* Crimson red bear */
+  --bear:    oklch(0.65 0.225 22);
+  /* Amber neutral */
+  --neutral: oklch(0.80 0.145 85);
+
+  /* Fibonacci gold */
+  --fib-gold: oklch(0.85 0.18 55);
+
+  --destructive:          oklch(0.65 0.225 22);
+  --destructive-foreground: oklch(0.98 0.005 250);
+
+  --border: oklch(0.275 0.018 258);
+  --input:  oklch(0.255 0.018 258);
+  --ring:   oklch(0.84 0.17 196);
+
+  /* ── Gradients ───────────────────────────────────── */
+  --gradient-bull: linear-gradient(135deg, oklch(0.76 0.185 158), oklch(0.85 0.14 178));
+  --gradient-bear: linear-gradient(135deg, oklch(0.65 0.225 22),  oklch(0.58 0.20 4));
+  --gradient-hero: radial-gradient(
+    ellipse 140% 100% at 50% 0%,
+    oklch(0.26 0.09 258) 0%,
+    oklch(0.145 0.018 258) 55%
+  );
+  --gradient-panel-top: linear-gradient(
+    180deg,
+    oklch(0.215 0.022 258 / 0.8) 0%,
+    oklch(0.185 0.018 258 / 0.6) 100%
+  );
+
+  /* ── Glows ───────────────────────────────────────── */
+  --glow-primary: 0 0 36px oklch(0.84 0.17 196 / 0.32);
+  --glow-bull:    0 0 28px oklch(0.76 0.185 158 / 0.30);
+  --glow-bear:    0 0 28px oklch(0.65 0.225 22  / 0.30);
+  --glow-fib:     0 0 20px oklch(0.85 0.18 55  / 0.25);
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --background: oklch(0.145 0.018 258);
+  --foreground: oklch(0.965 0.008 250);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
-  body {
+  * { border-color: var(--color-border); }
+  html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-
-  html[dir="rtl"] body {
-    font-family: "IBM Plex Sans Arabic", "Inter", sans-serif;
-  }
-
-  code, pre, .font-mono {
-    font-family: var(--font-mono);
-  }
-
-  ::selection {
-    background: color-mix(in oklab, var(--primary) 40%, transparent);
-    color: var(--foreground);
+  body {
+    background-image: var(--gradient-hero);
+    background-attachment: fixed;
+    background-size: cover;
   }
 }
 
-@theme inline {
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+/* ── Panel utility ───────────────────────────────────── */
+@utility panel {
+  background: var(--gradient-panel-top);
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-@utility surface-elevated {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 1px 0 oklch(1 0 0 / 0.03) inset, 0 8px 24px oklch(0 0 0 / 0.25);
+@utility panel-elevated {
+  background-color: var(--color-panel-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
 }
 
-@utility glow-primary {
-  box-shadow: var(--shadow-glow);
+/* ── Color utilities ─────────────────────────────────── */
+@utility text-bull    { color: var(--color-bull); }
+@utility text-bear    { color: var(--color-bear); }
+@utility text-neutral-signal { color: var(--color-neutral); }
+@utility bg-bull      { background-color: var(--color-bull); }
+@utility bg-bear      { background-color: var(--color-bear); }
+
+/* ── Glow utilities ──────────────────────────────────── */
+@utility glow-primary { box-shadow: var(--glow-primary); }
+@utility glow-bull    { box-shadow: var(--glow-bull);    }
+@utility glow-bear    { box-shadow: var(--glow-bear);    }
+@utility glow-fib     { box-shadow: var(--glow-fib);     }
+
+/* ── Gradient utilities ──────────────────────────────── */
+@utility gradient-bull { background-image: var(--gradient-bull); }
+@utility gradient-bear { background-image: var(--gradient-bear); }
+
+/* ── Animations ──────────────────────────────────────── */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 0.9; }
+  70%  { box-shadow: 0 0 0 12px transparent; opacity: 0; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 0; }
+}
+@utility pulse-ring { animation: pulse-ring 2s infinite; }
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@utility fade-in-up { animation: fade-in-up 0.35s ease-out both; }
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position:  200% center; }
 }
 
-@utility gradient-primary {
-  background: var(--gradient-primary);
-}
+/* Tab active state handled via inline border-b classes in TSX */
