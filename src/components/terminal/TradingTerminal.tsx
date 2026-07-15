@@ -95,7 +95,7 @@ export function TradingTerminal() {
   useEffect(() => {
     let w: Worker | null = null;
     try {
-      w = new Worker(new URL('../workers/lstm.worker.ts', import.meta.url), { type: 'module' });
+      w = new Worker(new URL('../../workers/lstm.worker.ts', import.meta.url), { type: 'module' });
       workerRef.current = w;
 
       w.onmessage = (e: MessageEvent) => {
@@ -114,28 +114,27 @@ export function TradingTerminal() {
 
         if (msg.type === 'progress') {
           // Forward progress to lstmStatus so sparkline & progress bar update
-          setLstmStatus((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  phase:      msg.phase ?? prev.phase,
-                  epoch:      msg.epoch ?? prev.epoch,
-                  totalEpochs: msg.totalEpochs ?? prev.totalEpochs,
-                  valLoss:    msg.valLoss ?? null,
-                  valDirectionAccuracy: msg.dirAcc ?? prev.valDirectionAccuracy,
-                  isTraining: true,
-                  epochHistory: [
-                    ...(prev.epochHistory ?? []),
-                    {
-                      epoch:   msg.epoch ?? 0,
-                      dirAcc:  msg.dirAcc ?? null,
-                      valLoss: msg.valLoss ?? null,
-                      phase:   msg.phase ?? 'fast',
-                    },
-                  ].slice(-80),
-                }
-              : prev,
-          );
+          setLstmStatus((prev) => {
+            if (!prev) return prev;
+            const nextPhase: LSTMModelStatus['phase'] =
+              msg.phase === 'fast' ? 'fast-training'
+              : msg.phase === 'full' ? 'full-training'
+              : prev.phase;
+            const recPhase: 'fast' | 'full' = msg.phase ?? 'fast';
+            return {
+              ...prev,
+              phase: nextPhase,
+              epoch: msg.epoch ?? prev.epoch,
+              totalEpochs: msg.totalEpochs ?? prev.totalEpochs,
+              valLoss: msg.valLoss ?? null,
+              valDirectionAccuracy: msg.dirAcc ?? prev.valDirectionAccuracy,
+              isTraining: true,
+              epochHistory: [
+                ...(prev.epochHistory ?? []),
+                { epoch: msg.epoch ?? 0, dirAcc: msg.dirAcc ?? null, valLoss: msg.valLoss ?? null, phase: recPhase },
+              ].slice(-80),
+            };
+          });
         } else if (msg.type === 'fast-ready' && msg.weightData && msg.shapes) {
           void loadWeightsFromWorker(msg.weightData, msg.shapes, 'fast').then(() =>
             setLstmStatus(getLSTMModelStatus()),
@@ -173,7 +172,7 @@ export function TradingTerminal() {
   const priceChangePct = prevPrice ? (priceChange / prevPrice) * 100 : 0;
 
   // CVD extended data (engine returns extra fields beyond the base type)
-  const cvdExt = analysis?.cvd as (typeof analysis.cvd & {
+  const cvdExt = analysis?.cvd as (NonNullable<typeof analysis>['cvd'] & {
     obvTrend?: "bullish" | "bearish" | "neutral";
     buyPressure?: number;
     ema9?: number[];
