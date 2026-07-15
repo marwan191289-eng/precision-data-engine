@@ -88,7 +88,7 @@ export function MultiTimeframeTable({ symbol, currentInterval, currentAnalysis }
           setLowerRow(r => ({ ...r, loading: true }));
           tasks.push(
             fetchCandles(symbol, lower, 300)
-              .then(cs => runFullAnalysis(cs, `${symbol}_${lower}`))
+              .then(cs => runFullAnalysis(cs, `${symbol}_${lower}`, { lightweight: true }))
               .then(a  => setLowerRow({ interval: lower!, analysis: a, loading: false, isCurrent: false }))
               .catch(() => setLowerRow(r => ({ ...r, loading: false }))),
           );
@@ -97,7 +97,7 @@ export function MultiTimeframeTable({ symbol, currentInterval, currentAnalysis }
           setHigherRow(r => ({ ...r, loading: true }));
           tasks.push(
             fetchCandles(symbol, higher, 300)
-              .then(cs => runFullAnalysis(cs, `${symbol}_${higher}`))
+              .then(cs => runFullAnalysis(cs, `${symbol}_${higher}`, { lightweight: true }))
               .then(a  => setHigherRow({ interval: higher!, analysis: a, loading: false, isCurrent: false }))
               .catch(() => setHigherRow(r => ({ ...r, loading: false }))),
           );

@@ -109,9 +109,26 @@ function buildAlert(
  *   • CVD keeps a session-level running total so it never resets to zero
  *     on each refresh (true cumulative CVD for the browser session).
  */
-export async function runFullAnalysis(candles: Candle[], sessionKey?: string): Promise<FullAnalysisResult> {
+/**
+ * Options for a lighter-weight run. Used by the Multi-Timeframe table which
+ * scans several intervals in parallel — it must NEVER kick off LSTM training
+ * on the main thread (would freeze the browser for each extra timeframe)
+ * and does not need its own row in the local audit trail.
+ */
+export interface RunAnalysisOptions {
+  /** Skip LSTM training and DB persistence. Prediction still runs on any
+   *  already-loaded model, otherwise falls back to statistical ensemble. */
+  lightweight?: boolean;
+}
+
+export async function runFullAnalysis(
+  candles: Candle[],
+  sessionKey?: string,
+  opts?: RunAnalysisOptions,
+): Promise<FullAnalysisResult> {
   const logs: string[] = [];
   const timestamp = Date.now();
+  const lightweight = opts?.lightweight === true;
 
   // ── Separate live (open) candle from closed candles ──────────────────────
   // REST klines mark the last entry isClosed=false (still building).
@@ -156,7 +173,7 @@ export async function runFullAnalysis(candles: Candle[], sessionKey?: string): P
   const elliott = matchElliottWaves(pivots);
   const cvd     = analyzeCVD(engineCandles, sessionKey);   // session-cumulative when key supplied
   const smc     = analyzeSMC(engineCandles, pivots, elliott, cvd);
-  const lstm    = await runLSTMPrediction(engineCandles);
+  const lstm    = await runLSTMPrediction(engineCandles, { skipTraining: lightweight });
   const cycle   = detectDominantCycle(engineCandles);
 
   logs.push(...regime.logs, ...elliott.logs, ...cvd.logs, ...smc.logs, ...lstm.logs, ...cycle.logs);
@@ -305,18 +322,22 @@ export async function runFullAnalysis(candles: Candle[], sessionKey?: string): P
   });
 
   // Fire-and-forget local persistence — never blocks or throws into the caller.
-  const [symbol, interval] = (sessionKey ?? 'UNKNOWN_UNKNOWN').split('_');
-  void saveAnalysisRun({
-    symbol,
-    interval,
-    timestamp,
-    price,
-    compositeScore,
-    uncertainty,
-    auditScore: audit.score,
-    alert,
-    auditFlags: audit.checks.filter((c) => !c.ok).map((c) => c.name),
-  });
+  // Skipped for lightweight (MTF) runs to keep IndexedDB bounded and avoid
+  // hammering the disk every 60s per adjacent timeframe.
+  if (!lightweight) {
+    const [symbol, interval] = (sessionKey ?? 'UNKNOWN_UNKNOWN').split('_');
+    void saveAnalysisRun({
+      symbol,
+      interval,
+      timestamp,
+      price,
+      compositeScore,
+      uncertainty,
+      auditScore: audit.score,
+      alert,
+      auditFlags: audit.checks.filter((c) => !c.ok).map((c) => c.name),
+    });
+  }
 
   return {
     timestamp,
