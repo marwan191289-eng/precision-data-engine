@@ -543,7 +543,10 @@ function toRecommendation(direction: 'up' | 'down', confidence: number): 'BUY' |
   return direction === 'up' ? 'BUY' : 'SELL';
 }
 
-export async function runLSTMPrediction(candles: Candle[]): Promise<LSTMPrediction> {
+export async function runLSTMPrediction(
+  candles: Candle[],
+  opts?: { skipTraining?: boolean },
+): Promise<LSTMPrediction> {
   const logs: string[] = [];
   if (candles.length < 30) {
     return {
@@ -558,7 +561,10 @@ export async function runLSTMPrediction(candles: Candle[]): Promise<LSTMPredicti
     };
   }
 
-  void trainIfNeeded(candles);
+  // MTF / lightweight callers must never kick off a main-thread training
+  // pass — the full Bi-LSTM easily blocks the UI for tens of seconds per
+  // extra timeframe. They fall back to the statistical ensemble instead.
+  if (!opts?.skipTraining) void trainIfNeeded(candles);
 
   const lastPrice = candles[candles.length - 1].close;
   const regime = detectRegime(candles);
