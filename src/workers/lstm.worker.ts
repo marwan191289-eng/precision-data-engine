@@ -351,7 +351,7 @@ async function train(candles: Candle[]) {
     },
   });
 
-  if (bestWts) { fullBuilt.setWeights(bestWts); bestWts.forEach(t => t.dispose()); }
+  if (bestWts) { const bw = bestWts as tf.Tensor[]; fullBuilt.setWeights(bw); bw.forEach((t) => t.dispose()); }
 
   const fullSer = await serializeWeights(fullBuilt);
   fullBuilt.dispose();
