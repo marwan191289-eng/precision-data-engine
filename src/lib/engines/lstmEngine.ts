@@ -98,7 +98,7 @@ export async function loadWeightsFromWorker(
 ): Promise<void> {
   try {
     const built = phase === 'fast' ? buildFastModel() : buildModel();
-    const tensors = shapes.map((shape, i) => tf.tensor(weightData[i], shape as tf.Shape));
+    const tensors = shapes.map((shape, i) => tf.tensor(weightData[i], shape as number[]));
     built.setWeights(tensors);
     tensors.forEach((t) => t.dispose());
 
@@ -390,7 +390,7 @@ export async function trainIfNeeded(candles: Candle[]): Promise<void> {
             // fast model only has val_loss (no named accuracy metric registered)
             status.epochHistory = [
               ...status.epochHistory,
-              { epoch: epoch + 1, dirAcc: null, valLoss: status.valLoss, phase: 'fast' },
+              { epoch: epoch + 1, dirAcc: null, valLoss: status.valLoss, phase: 'fast' as const },
             ].slice(-80);
             await tf.nextFrame();
           },
@@ -439,7 +439,7 @@ export async function trainIfNeeded(candles: Candle[]): Promise<void> {
           }
           status.epochHistory = [
             ...status.epochHistory,
-            { epoch: epoch + 1, dirAcc: typeof rawAcc === 'number' ? rawAcc : null, valLoss: status.valLoss, phase: 'full' },
+            { epoch: epoch + 1, dirAcc: typeof rawAcc === 'number' ? rawAcc : null, valLoss: status.valLoss, phase: 'full' as const },
           ].slice(-80);
 
           const vl = logs?.val_loss as number | undefined;
@@ -447,7 +447,7 @@ export async function trainIfNeeded(candles: Candle[]): Promise<void> {
             if (vl < bestValLoss - 1e-5) {
               bestValLoss = vl;
               patience    = 0;
-              if (bestWeights) bestWeights.forEach((t) => t.dispose());
+              if (bestWeights) (bestWeights as tf.Tensor[]).forEach((t) => t.dispose());
               bestWeights = fullBuilt.getWeights().map((w) => w.clone());
             } else {
               patience++;
@@ -460,8 +460,9 @@ export async function trainIfNeeded(candles: Candle[]): Promise<void> {
     });
 
     if (bestWeights) {
-      fullBuilt.setWeights(bestWeights);
-      bestWeights.forEach((t) => t.dispose());
+      const bw = bestWeights as tf.Tensor[];
+      fullBuilt.setWeights(bw);
+      bw.forEach((t) => t.dispose());
     }
 
     // Post-hoc temperature calibration on val set

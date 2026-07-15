@@ -352,7 +352,8 @@ function FixBadge({ type }: { type: "fixed" | "new" }) {
 }
 
 export function ReportPanel({ analysis }: Props) {
-  const allItems = AUDIT_SECTIONS.flatMap(s => s.items);
+  type AuditItem = { id: string; name: string; status: "solid" | "conditional" | "limited"; codeQuality: number; realData: boolean; summary: string; honest: string[] };
+  const allItems: AuditItem[] = AUDIT_SECTIONS.flatMap((s) => s.items as unknown as AuditItem[]);
   const solidCount       = allItems.filter(i => i.status === "solid").length;
   const conditionalCount = allItems.filter(i => i.status === "conditional").length;
   const limitedCount     = allItems.filter(i => i.status === "limited").length;
